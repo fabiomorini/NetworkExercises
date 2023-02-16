@@ -56,7 +56,7 @@ void main() {
             sf::Packet packet;
             std::string message = "Hello, server";
             packet << message;
-
+            client->Send(packet, IP, PORT);
         }
 	}
 }
