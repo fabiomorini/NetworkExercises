@@ -2,7 +2,25 @@
 
 TCPSocketManager::Status TCPSocketManager::Send(sf::Packet& packet, sf::IpAddress ip, unsigned short port)
 {
-	return Status();
+	sf::TcpSocket socket;
+	sf::Socket::Status status = socket.connect(ip, port);
+
+	if (status != sf::Socket::Done)
+	{
+		std::cerr << "Error connecting to " << ip.toString() << ":" << port << std::endl;
+		return Status::Error;
+	}
+	
+	status = socket.send(packet);
+
+	if (status != sf::Socket::Done)
+	{
+		std::cerr << "Error sending packet to " << ip.toString() << ":" << port << std::endl;
+		return Status::Error;
+	}
+	
+	socket.disconnect();
+	return Status::Done;
 }
 
 TCPSocketManager::Status TCPSocketManager::Receive(sf::Packet*& packet, sf::IpAddress& ip, unsigned short& port)
@@ -21,37 +39,51 @@ bool TCPSocketManager::Disconnect()
 
 #pragma region Server
 
-TCPSocketManager::Status TCPSocketServer::Receive(sf::Packet*& packet, sf::IpAddress& ip, unsigned short& port)
+TCPSocketManager::Status TCPSocketServer::Receive(sf::Packet& packet, sf::IpAddress& ip, unsigned short& port)
 {
-	sf::Packet received_packet;
-	std::string message;
-	incoming.receive(received_packet); received_packet >> message;
+	sf::Socket::Status status = dispatcher.accept(incoming);
+
+	if (status != sf::Socket::Done)
+	{
+		std::cerr << "Error accepting incoming connection" << std::endl;
+		return Status::Error;
+	}
+
+	//receive the packet
+	status = incoming.receive(packet);
+
+	if (status != sf::Socket::Done)
+	{
+		std::cerr << "Error receiving packet" << std::endl;
+		return Status::Error;
+	}
+
+	//get the client's IP address and port
+	ip = incoming.getRemoteAddress();
+	port = incoming.getRemotePort();
+
+	return Status::Done;
 
 }
 
 bool TCPSocketServer::Listen(sf::IpAddress& ip, unsigned short& port)
 {
 	sf::Socket::Status status = dispatcher.listen(port, ip);
-	if (status == sf::Socket::Error)
+
+	if (status != sf::Socket::Done)
 	{
-		std::cout << "No se puede vincular al puerto "<< port << std::endl;
+		std::cerr << "Error listening on port " << port << std::endl;
 		return false;
 	}
-
-	if (dispatcher.accept(incoming) == sf::Socket::Error)
-	{
-		std::cout << "Error al aceptar la conexión" << std::endl;
-		return false;
-	}
-
-	//crear socket
 
 	return true;
 }
 
 bool TCPSocketServer::Disconnect()
 {
-	
+	incoming.disconnect();
+
+	return true;
 }
 
 #pragma endregion
