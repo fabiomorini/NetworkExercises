@@ -92,12 +92,31 @@ bool TCPSocketServer::Disconnect()
 
 TCPSocketManager::Status TCPSocketClient::Receive(sf::Packet*& packet, sf::IpAddress& ip, unsigned short& port)
 {
-	return Status();
+	sf::Socket::Status status = sock.receive(packet);
+
+	if (status != sf::Socket::Done)
+	{
+		std::cerr << "Error receiving packet" << std::endl;
+		return Status::Error;
+	}
+	
+	ip = sock.getRemoteAddress();
+	port = sock.getRemotePort();
+
+	return Status::Done;
 }
 
 TCPSocketManager::Status TCPSocketClient::Connect(unsigned short port)
 {
-	return Status();
+	sf::Socket::Status status = sock.connect("localhost", port);
+
+	if (status != sf::Socket::Done)
+	{
+		std::cerr << "Error connecting to server" << std::endl;
+		return Status::Error;
+	}
+
+	return Status::Connected;
 }
 
 #pragma endregion

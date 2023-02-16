@@ -28,13 +28,14 @@ class TCPSocketServer : public TCPSocketManager
 
 public:
 
-	virtual Status Receive(sf::Packet*& packet, sf::IpAddress& ip, unsigned short& port);
+	virtual Status Receive(sf::Packet& packet, sf::IpAddress& ip, unsigned short& port);
 	bool Listen(sf::IpAddress& ip, unsigned short& port);
 	virtual bool Disconnect();
 };
 
 class TCPSocketClient : public TCPSocketManager
 {
+	sf::TcpSocket sock;
 
 public:
 	virtual Status Receive(sf::Packet*& packet, sf::IpAddress& ip, unsigned short& port);
