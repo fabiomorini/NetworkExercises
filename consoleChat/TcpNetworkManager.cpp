@@ -23,7 +23,7 @@ TCPSocketManager::Status TCPSocketManager::Send(sf::Packet& packet, sf::IpAddres
 	return Status::Done;
 }
 
-TCPSocketManager::Status TCPSocketManager::Receive(sf::Packet*& packet, sf::IpAddress& ip, unsigned short& port)
+TCPSocketManager::Status TCPSocketManager::Receive(sf::Packet& packet, sf::IpAddress& ip, unsigned short& port)
 {
 	return Status();
 }
@@ -31,10 +31,6 @@ TCPSocketManager::Status TCPSocketManager::Receive(sf::Packet*& packet, sf::IpAd
 unsigned short TCPSocketManager::GetLocalPort()
 {
 	return 0;
-}
-
-bool TCPSocketManager::Disconnect()
-{
 }
 
 #pragma region Server
@@ -90,7 +86,7 @@ bool TCPSocketServer::Disconnect()
 
 #pragma region Client
 
-TCPSocketManager::Status TCPSocketClient::Receive(sf::Packet*& packet, sf::IpAddress& ip, unsigned short& port)
+TCPSocketManager::Status TCPSocketClient::Receive(sf::Packet& packet, sf::IpAddress& ip, unsigned short& port)
 {
 	sf::Socket::Status status = sock.receive(packet);
 
@@ -117,6 +113,11 @@ TCPSocketManager::Status TCPSocketClient::Connect(unsigned short port)
 	}
 
 	return Status::Connected;
+}
+
+bool TCPSocketClient::Disconnect()
+{
+	return true;
 }
 
 #pragma endregion
