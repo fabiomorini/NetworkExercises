@@ -15,7 +15,7 @@ public:
 
 	TCPSocketManager() = default;
 	Status Send(sf::Packet& packet, sf::IpAddress ip, unsigned short port);
-	virtual Status Receive(sf::Packet*& packet, sf::IpAddress& ip, unsigned short& port) = 0;
+	virtual Status Receive(sf::Packet& packet, sf::IpAddress& ip, unsigned short& port) = 0;
 	unsigned short GetLocalPort();
 	virtual bool Disconnect() = 0;
 };
@@ -27,16 +27,19 @@ class TCPSocketServer : public TCPSocketManager
 	sf::TcpSocket sock;
 
 public:
-
-	virtual Status Receive(sf::Packet*& packet, sf::IpAddress& ip, unsigned short& port);
+	TCPSocketServer() = default;
+	virtual Status Receive(sf::Packet& packet, sf::IpAddress& ip, unsigned short& port) override;
 	bool Listen(sf::IpAddress& ip, unsigned short& port);
-	virtual bool Disconnect();
+	virtual bool Disconnect() override;
 };
 
 class TCPSocketClient : public TCPSocketManager
 {
+	sf::TcpSocket sock;
 
 public:
-	virtual Status Receive(sf::Packet*& packet, sf::IpAddress& ip, unsigned short& port);
-	Status Connect(unsigned short port);
+	TCPSocketClient() = default;
+	virtual Status Receive(sf::Packet& packet, sf::IpAddress& ip, unsigned short& port) override;
+	Status Connect(sf::IpAddress& ip, unsigned short port);
+	virtual bool Disconnect() override;
 };
