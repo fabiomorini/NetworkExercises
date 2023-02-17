@@ -40,6 +40,6 @@ class TCPSocketClient : public TCPSocketManager
 public:
 	TCPSocketClient() = default;
 	virtual Status Receive(sf::Packet& packet, sf::IpAddress& ip, unsigned short& port) override;
-	Status Connect(unsigned short port);
+	Status Connect(sf::IpAddress& ip, unsigned short port);
 	virtual bool Disconnect() override;
 };
