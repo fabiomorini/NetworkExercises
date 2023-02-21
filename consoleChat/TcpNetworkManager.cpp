@@ -41,7 +41,7 @@ TCPSocketManager::Status TCPSocketServer::Receive(sf::Packet& packet, sf::IpAddr
 
 	if (status != sf::Socket::Done)
 	{
-		std::cerr << "Error accepting incoming connection" << std::endl;
+		std::cerr << "Error accepting incoming connection." << std::endl;
 		return Status::Error;
 	}
 
@@ -50,7 +50,7 @@ TCPSocketManager::Status TCPSocketServer::Receive(sf::Packet& packet, sf::IpAddr
 
 	if (status != sf::Socket::Done)
 	{
-		std::cerr << "Error receiving packet" << std::endl;
+		std::cerr << "Error receiving packet." << std::endl;
 		return Status::Error;
 	}
 
@@ -92,7 +92,7 @@ TCPSocketManager::Status TCPSocketClient::Receive(sf::Packet& packet, sf::IpAddr
 
 	if (status != sf::Socket::Done)
 	{
-		std::cerr << "Error receiving packet" << std::endl;
+		std::cerr << "Error receiving packet." << std::endl;
 		return Status::Error;
 	}
 	
@@ -108,7 +108,7 @@ TCPSocketManager::Status TCPSocketClient::Connect(sf::IpAddress& ip, unsigned sh
 
 	if (status != sf::Socket::Done)
 	{
-		std::cerr << "Error connecting to server" << std::endl;
+		std::cerr << "Error connecting to server." << std::endl;
 		return Status::Error;
 	}
 
