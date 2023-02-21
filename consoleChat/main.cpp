@@ -9,7 +9,8 @@ void main() {
 	std::cout << "Select a mode: (1) server, (2) cliente" << std::endl;
 	std::cin >> mode_str;
 	server_mode = std::stoi(mode_str);
-    sf::IpAddress ip = sf::IpAddress::getLocalAddress();
+    sf::IpAddress ip("127.0.0.1");
+    //sf::IpAddress ip = sf::IpAddress::getLocalAddress();
     unsigned short port = 5000;
     sf::Packet packet;
 

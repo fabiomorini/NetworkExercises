@@ -3,7 +3,7 @@
 TCPSocketManager::Status TCPSocketManager::Send(sf::Packet& packet, sf::IpAddress ip, unsigned short port)
 {
 	sf::TcpSocket socket;
-	sf::Socket::Status status = socket.connect("127.0.0.1", port);
+	sf::Socket::Status status = socket.connect(ip, port);
 
 	if (status != sf::Socket::Done)
 	{
@@ -64,7 +64,7 @@ TCPSocketManager::Status TCPSocketServer::Receive(sf::Packet& packet, sf::IpAddr
 
 bool TCPSocketServer::Listen(sf::IpAddress& ip, unsigned short& port)
 {
-	sf::Socket::Status status = dispatcher.listen(port, "127.0.0.1");
+	sf::Socket::Status status = dispatcher.listen(port, ip);
 
 	if (status != sf::Socket::Done)
 	{
@@ -104,7 +104,7 @@ TCPSocketManager::Status TCPSocketClient::Receive(sf::Packet& packet, sf::IpAddr
 
 TCPSocketManager::Status TCPSocketClient::Connect(sf::IpAddress& ip, unsigned short port)
 {
-	sf::Socket::Status status = sock.connect("127.0.0.1", port);
+	sf::Socket::Status status = sock.connect(ip, port);
 
 	if (status != sf::Socket::Done)
 	{
