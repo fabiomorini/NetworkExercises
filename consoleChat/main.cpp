@@ -14,6 +14,7 @@ void main() {
     unsigned short port = 5000;
     sf::Packet packet;
 
+    #pragma region Server
 	if (server_mode == 1) {
         std::cout << "Server mode running." << std::endl;
 
@@ -52,6 +53,9 @@ void main() {
             std::cout << "Failed to start server." << std::endl;
         }
     }
+    #pragma endregion Server
+
+    #pragma region Client
 	else if (server_mode == 2) {
 		std::cout << "Client mode running." << std::endl;
         auto client = new TCPSocketClient(); //Abrimos un nuevo socket para la comunicación del cliente
@@ -70,4 +74,5 @@ void main() {
             std::cout << "Message sended to server." << std::endl;
         }
 	}
+    #pragma endregion client
 }
