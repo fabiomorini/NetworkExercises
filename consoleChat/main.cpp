@@ -12,7 +12,6 @@ void main() {
     sf::IpAddress ip("127.0.0.1");
     //sf::IpAddress ip = sf::IpAddress::getLocalAddress();
     unsigned short port = 5000;
-    sf::Packet packet;
 
     #pragma region Server
 	if (server_mode == 1) {
@@ -30,6 +29,9 @@ void main() {
                 sf::IpAddress client_ip;
                 unsigned short client_port;
 
+                //Creamos un paquete nuevo para que el servidor lo utilice
+                sf::Packet packet;
+
                 //Recibimos el paquete y rellenamos las variables creadas anteriormente
                 //(obtenemos el ip y puerto del cliente que ha enviado el paquete)
                 //(si nos interesase, aquí podríamos filtrar quien puede enviarnos paquetes)
@@ -43,7 +45,7 @@ void main() {
                     std::string message;
                     packet >> message;
                     std::cout << "Received message from client: " << message << std::endl;
-                    packet.clear(); //Limpiamos el contenido del paquete para reutilizarlo
+                    packet.clear(); //Limpiamos el paquete
                 }
             } while (status != TCPSocketManager::Status::Disconnected); //Si el cliente se desconecta, cerramos la conexión
             std::cout << "Client disconnected." << std::endl;
@@ -65,11 +67,15 @@ void main() {
         {
             std::cout << "Connected to server." << std::endl;
 
+            //Creamos un paquete nuevo para que el cliente lo utilice
+            sf::Packet packet;
+
             // on sending side
             std::string message = "Client send hello :3";
             packet << message;
             
             client->Send(packet, ip, port); //Enviamos la información de conexión del cliente y la información del paquete a enviar
+            packet.clear(); //Limpiamos el paquete
 
             std::cout << "Message sended to server." << std::endl;
         }

@@ -59,20 +59,45 @@ TCPSocketManager::Status TCPSocketServer::Receive(sf::Packet& packet, sf::IpAddr
 	port = incoming.getRemotePort();
 
 	return Status::Done;
-
 }
 
 bool TCPSocketServer::Listen(sf::IpAddress& ip, unsigned short& port)
 {
 	sf::Socket::Status status = dispatcher.listen(port, ip);
 
-	if (status != sf::Socket::Done)
+	switch (status)
+	{
+	case sf::Socket::Done:
+		return true;
+		break;
+	case sf::Socket::NotReady:
+		std::cerr << "Error listening on port " << port << std::endl;
+		return false;
+		break;
+	case sf::Socket::Partial:
+		std::cerr << "Error listening on port " << port << std::endl;
+		return false;
+		break;
+	case sf::Socket::Disconnected:
+		std::cerr << "Error listening on port " << port << std::endl;
+		return false;
+		break;
+	case sf::Socket::Error:
+		std::cerr << "Error listening on port " << port << std::endl;
+		return false;
+		break;
+	default:
+		return false;
+		break;
+	}
+
+	/*if (status != sf::Socket::Done)
 	{
 		std::cerr << "Error listening on port " << port << std::endl;
 		return false;
-	}
+	}*//*
 
-	return true;
+	return true;*/
 }
 
 bool TCPSocketServer::Disconnect()
