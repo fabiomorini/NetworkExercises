@@ -52,7 +52,7 @@ void main() {
                     std::cout << cliAlias << message << std::endl;
                     sf::sleep(sf::milliseconds(1000));
                     packet.clear(); //Limpiamos el paquete
-                    std::cout << sysAlias << "Package cleared." << std::endl;
+                    std::cout << sysAlias << "Recieved package cleared." << std::endl;
                 }
             } while (status != TCPSocketManager::Status::Disconnected); //Si el cliente se desconecta, cerramos la conexión
             std::cout << sysAlias << "Client disconnected." << std::endl;
@@ -83,6 +83,7 @@ void main() {
             
             client->Send(packet, ip, port); //Enviamos la información de conexión del cliente y la información del paquete a enviar
             packet.clear(); //Limpiamos el paquete
+            std::cout << sysAlias << "Sended package cleared." << std::endl;
 
             std::cout << sysAlias << "Message sended to server." << std::endl;
         }
