@@ -43,8 +43,6 @@ void main() {
                 //Al ejecutar esta línea, el servidor queda a la espera de una conexión entrante de algún cliente
                 status = server->Receive(packet, client_ip, client_port);
 
-                std::cout << sysAlias << "incoming package..." << std::endl;
-
                 //Si hemos obtenido los datos correctamente, obtenemos la información del paquete
                 if (status == TCPSocketManager::Status::Done)
                 {

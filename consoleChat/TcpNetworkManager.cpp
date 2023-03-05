@@ -39,6 +39,8 @@ TCPSocketManager::Status TCPSocketServer::Receive(sf::Packet& packet, sf::IpAddr
 {
 	sf::Socket::Status status = dispatcher.accept(incoming);
 
+	std::cout << sysAlias << "incoming package..." << std::endl;
+
 	if (status != sf::Socket::Done)
 	{
 		std::cerr << sysAlias << "Error accepting incoming connection." << std::endl;
