@@ -25,7 +25,7 @@ void main() {
         {
             std::cout << sysAlias << "Server started on " << ip.toString() << ":" << port << std::endl;
 
-            // Wait for client to connect
+            //Estado de la conexión con el cliente
             TCPSocketManager::Status status;
 
             do { //Esperamos la conexión de clientes
@@ -35,13 +35,15 @@ void main() {
                 //Creamos un paquete nuevo para que el servidor lo utilice
                 sf::Packet packet;
 
+                std::cout << sysAlias << "Waiting clients..." << std::endl;
+
                 //Recibimos el paquete y rellenamos las variables creadas anteriormente
                 //(obtenemos el ip y puerto del cliente que ha enviado el paquete)
                 //(si nos interesase, aquí podríamos filtrar quien puede enviarnos paquetes)
                 //Al ejecutar esta línea, el servidor queda a la espera de una conexión entrante de algún cliente
                 status = server->Receive(packet, client_ip, client_port);
 
-                std::cout << (status == TCPSocketManager::Status::Done) << std::endl;
+                std::cout << sysAlias << "incoming package..." << std::endl;
 
                 //Si hemos obtenido los datos correctamente, obtenemos la información del paquete
                 if (status == TCPSocketManager::Status::Done)
@@ -54,6 +56,23 @@ void main() {
                     packet.clear(); //Limpiamos el paquete
                     std::cout << sysAlias << "Recieved package cleared." << std::endl;
                 }
+                else {
+                    switch (status)
+                    {
+                    case TCPSocketManager::Status::Disconnected:
+                        std::cout << sysAlias << "Client status: Disconnected." << std::endl;
+
+                    case TCPSocketManager::Status::Connected:
+                        std::cout << sysAlias << "Client status: Connected." << std::endl;
+
+                    case TCPSocketManager::Status::Error:
+                        std::cout << sysAlias << "Client status: Error." << std::endl;
+
+                    default:
+                        std::cout << sysAlias << "Client status: Unknown." << std::endl;
+                    }
+                }
+
             } while (status != TCPSocketManager::Status::Disconnected); //Si el cliente se desconecta, cerramos la conexión
             std::cout << sysAlias << "Client disconnected." << std::endl;
         }
@@ -78,14 +97,14 @@ void main() {
             sf::Packet packet;
 
             // on sending side
-            std::string message = "Client send hello :3";
+            std::string message = "hello :3";
             packet << message;
             
             client->Send(packet, ip, port); //Enviamos la información de conexión del cliente y la información del paquete a enviar
+            std::cout << cliAlias << '"' << message << '"' << " sended to server." << std::endl;
+            
             packet.clear(); //Limpiamos el paquete
             std::cout << sysAlias << "Sended package cleared." << std::endl;
-
-            std::cout << sysAlias << "Message sended to server." << std::endl;
         }
 	}
     #pragma endregion client
