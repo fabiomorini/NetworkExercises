@@ -6,7 +6,10 @@
 void main() {
 	int server_mode;
 	std::string mode_str;
-	std::cout << "Select a mode: (1) server, (2) cliente" << std::endl;
+    std::string sysAlias = "System: ";
+    std::string srvAlias = "Server: ";
+    std::string cliAlias = "Client: ";
+	std::cout << sysAlias << "Select a mode: (1) server, (2) cliente" << std::endl;
 	std::cin >> mode_str;
 	server_mode = std::stoi(mode_str);
     sf::IpAddress ip("127.0.0.1");
@@ -15,12 +18,12 @@ void main() {
 
     #pragma region Server
 	if (server_mode == 1) {
-        std::cout << "Server mode running." << std::endl;
+        std::cout << sysAlias << "Server mode running." << std::endl;
 
         auto server = new TCPSocketServer(); //Abrimos un nuevo socket para la comunicación del servidor
         if (server->Listen(ip, port)) //Empezamos a escuchar el puerto especificado si está disponible
         {
-            std::cout << "Server started on " << ip.toString() << ":" << port << std::endl;
+            std::cout << sysAlias << "Server started on " << ip.toString() << ":" << port << std::endl;
 
             // Wait for client to connect
             TCPSocketManager::Status status;
@@ -38,34 +41,38 @@ void main() {
                 //Al ejecutar esta línea, el servidor queda a la espera de una conexión entrante de algún cliente
                 status = server->Receive(packet, client_ip, client_port);
 
+                std::cout << (status == TCPSocketManager::Status::Done) << std::endl;
+
                 //Si hemos obtenido los datos correctamente, obtenemos la información del paquete
                 if (status == TCPSocketManager::Status::Done)
                 {
                     // Process received packet
                     std::string message;
                     packet >> message;
-                    std::cout << "Received message from client: " << message << std::endl;
+                    std::cout << cliAlias << message << std::endl;
+                    sf::sleep(sf::milliseconds(1000));
                     packet.clear(); //Limpiamos el paquete
+                    std::cout << sysAlias << "Package cleared." << std::endl;
                 }
             } while (status != TCPSocketManager::Status::Disconnected); //Si el cliente se desconecta, cerramos la conexión
-            std::cout << "Client disconnected." << std::endl;
+            std::cout << sysAlias << "Client disconnected." << std::endl;
         }
         else
         {
-            std::cout << "Failed to start server." << std::endl;
+            std::cout << sysAlias << "Failed to start server." << std::endl;
         }
     }
     #pragma endregion Server
 
     #pragma region Client
 	else if (server_mode == 2) {
-		std::cout << "Client mode running." << std::endl;
+		std::cout << sysAlias << "Client mode running." << std::endl;
         auto client = new TCPSocketClient(); //Abrimos un nuevo socket para la comunicación del cliente
 
         //Conectamos con el servidor alojado en la dirección y puerto especificados
         if (client->Connect(ip, port) == TCPSocketManager::Status::Connected)
         {
-            std::cout << "Connected to server." << std::endl;
+            std::cout << sysAlias << "Connected to server." << std::endl;
 
             //Creamos un paquete nuevo para que el cliente lo utilice
             sf::Packet packet;
@@ -77,7 +84,7 @@ void main() {
             client->Send(packet, ip, port); //Enviamos la información de conexión del cliente y la información del paquete a enviar
             packet.clear(); //Limpiamos el paquete
 
-            std::cout << "Message sended to server." << std::endl;
+            std::cout << sysAlias << "Message sended to server." << std::endl;
         }
 	}
     #pragma endregion client

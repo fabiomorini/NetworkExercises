@@ -7,7 +7,7 @@ TCPSocketManager::Status TCPSocketManager::Send(sf::Packet& packet, sf::IpAddres
 
 	if (status != sf::Socket::Done)
 	{
-		std::cerr << "Error connecting to " << ip.toString() << ":" << port << std::endl;
+		std::cerr << sysAlias << "Error connecting to " << ip.toString() << ":" << port << std::endl;
 		return Status::Error;
 	}
 	
@@ -15,7 +15,7 @@ TCPSocketManager::Status TCPSocketManager::Send(sf::Packet& packet, sf::IpAddres
 
 	if (status != sf::Socket::Done)
 	{
-		std::cerr << "Error sending packet to " << ip.toString() << ":" << port << std::endl;
+		std::cerr << sysAlias << "Error sending packet to " << ip.toString() << ":" << port << std::endl;
 		return Status::Error;
 	}
 	
@@ -41,7 +41,7 @@ TCPSocketManager::Status TCPSocketServer::Receive(sf::Packet& packet, sf::IpAddr
 
 	if (status != sf::Socket::Done)
 	{
-		std::cerr << "Error accepting incoming connection." << std::endl;
+		std::cerr << sysAlias << "Error accepting incoming connection." << std::endl;
 		return Status::Error;
 	}
 
@@ -50,7 +50,7 @@ TCPSocketManager::Status TCPSocketServer::Receive(sf::Packet& packet, sf::IpAddr
 
 	if (status != sf::Socket::Done)
 	{
-		std::cerr << "Error receiving packet." << std::endl;
+		std::cerr << sysAlias << "Error receiving packet." << std::endl;
 		return Status::Error;
 	}
 
@@ -71,19 +71,19 @@ bool TCPSocketServer::Listen(sf::IpAddress& ip, unsigned short& port)
 		return true;
 		break;
 	case sf::Socket::NotReady:
-		std::cerr << "Error listening on port " << port << std::endl;
+		std::cerr << sysAlias << "Error listening on port " << port << std::endl;
 		return false;
 		break;
 	case sf::Socket::Partial:
-		std::cerr << "Error listening on port " << port << std::endl;
+		std::cerr << sysAlias << "Error listening on port " << port << std::endl;
 		return false;
 		break;
 	case sf::Socket::Disconnected:
-		std::cerr << "Error listening on port " << port << std::endl;
+		std::cerr << sysAlias << "Error listening on port " << port << std::endl;
 		return false;
 		break;
 	case sf::Socket::Error:
-		std::cerr << "Error listening on port " << port << std::endl;
+		std::cerr << sysAlias << "Error listening on port " << port << std::endl;
 		return false;
 		break;
 	default:
@@ -93,7 +93,7 @@ bool TCPSocketServer::Listen(sf::IpAddress& ip, unsigned short& port)
 
 	/*if (status != sf::Socket::Done)
 	{
-		std::cerr << "Error listening on port " << port << std::endl;
+		std::cerr << sysAlias << "Error listening on port " << port << std::endl;
 		return false;
 	}*//*
 
@@ -117,7 +117,7 @@ TCPSocketManager::Status TCPSocketClient::Receive(sf::Packet& packet, sf::IpAddr
 
 	if (status != sf::Socket::Done)
 	{
-		std::cerr << "Error receiving packet." << std::endl;
+		std::cerr << sysAlias << "Error receiving packet." << std::endl;
 		return Status::Error;
 	}
 	
@@ -133,7 +133,7 @@ TCPSocketManager::Status TCPSocketClient::Connect(sf::IpAddress& ip, unsigned sh
 
 	if (status != sf::Socket::Done)
 	{
-		std::cerr << "Error connecting to server." << std::endl;
+		std::cerr << sysAlias << "Error connecting to server." << std::endl;
 		return Status::Error;
 	}
 

@@ -18,6 +18,7 @@ public:
 	virtual Status Receive(sf::Packet& packet, sf::IpAddress& ip, unsigned short& port) = 0;
 	unsigned short GetLocalPort();
 	virtual bool Disconnect() = 0;
+	std::string sysAlias = "System: ";
 };
 
 class TCPSocketServer : public TCPSocketManager
