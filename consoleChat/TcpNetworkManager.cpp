@@ -3,19 +3,12 @@
 TCPSocketManager::Status TCPSocketManager::Send(sf::Packet& packet, sf::IpAddress ip, unsigned short port)
 {
 	sf::TcpSocket socket;
-	sf::Socket::Status status = socket.connect(ip, port);
-
-	if (status != sf::Socket::Done)
-	{
-		std::cerr << sysAlias << "Error connecting to " << ip.toString() << ":" << port << std::endl;
-		return Status::Error;
-	}
 	
-	status = socket.send(packet);
+	sf::Socket::Status status = socket.send(packet);
 
 	if (status != sf::Socket::Done)
 	{
-		std::cerr << sysAlias << "Error sending packet to " << ip.toString() << ":" << port << std::endl;
+		std::cerr << sysAlias << "Error sending packet to " << ip << ":" << port << std::endl;
 		return Status::Error;
 	}
 	
@@ -39,7 +32,7 @@ TCPSocketManager::Status TCPSocketServer::Receive(sf::Packet& packet, sf::IpAddr
 {
 	sf::Socket::Status status = dispatcher.accept(incoming);
 
-	std::cout << sysAlias << "incoming package..." << std::endl;
+	std::cout << sysAlias << "Detected incoming connection..." << std::endl;
 
 	if (status != sf::Socket::Done)
 	{
