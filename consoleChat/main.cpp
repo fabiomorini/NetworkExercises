@@ -7,7 +7,10 @@
 
 std::string GetLineFromCin() {
 	std::string line;
+
 	std::getline(std::cin, line);
+    std::cin.clear();
+
 	return line;
 }
 
@@ -170,6 +173,8 @@ void main() {
 	std::string mode_str;
 	std::cout << "System: " << "Select a mode: (1) server, (2) cliente" << std::endl;
 	std::cin >> mode_str;
+    std::cin.clear();
+    std::cin.ignore();
 	server_mode = std::stoi(mode_str);
     sf::IpAddress ip("127.0.0.1");
     //sf::IpAddress ip = sf::IpAddress::getLocalAddress();
