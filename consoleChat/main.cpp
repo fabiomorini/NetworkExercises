@@ -3,7 +3,6 @@
 #include <iostream> 
 #include "TcpNetworkManager.h"
 #include <future>
-#include "main.h"
 
 
 std::string GetLineFromCin() {
@@ -176,7 +175,7 @@ void main() {
         auto server = new TCPSocketServer(); //Abrimos un nuevo socket para la comunicación del servidor
 
         //Dejamos que el servidor pueda enviar mensajes a los clientes
-        std::future<void> serverMessengerHandler = std::async(std::launch::async, serverMessageHandler, server, ip, port);
+        //std::future<void> serverMessengerHandler = std::async(std::launch::async, serverMessageHandler, server, ip, port);
 
         if (server->Listen(ip, port)) //Empezamos a escuchar el puerto especificado si está disponible
         {
