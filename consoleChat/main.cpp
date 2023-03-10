@@ -29,13 +29,13 @@ void clientMessageHandler(TCPSocketClient* client, sf::IpAddress ip, unsigned sh
 
         message = GetLineFromCin();
 
+        packet.clear(); //Limpiamos el paquete para su uso
         packet << message;
 
         client->Send(packet, ip, port); //Enviamos la información de conexión y la información del paquete a enviar
         std::cout << cliAlias << message << std::endl;
 
-        packet.clear(); //Limpiamos el paquete
-        message.clear(); //Limpiamos la cadena para el mensaje
+        message.clear(); //Limpiamos la cadena del mensaje
     }
 }
 
@@ -49,23 +49,18 @@ void serverMessageHandler(TCPSocketServer* server, sf::IpAddress ip, unsigned sh
 
     while (true)
     {
-        if (message.size() < 0)
-        {
             //El cliente escribe un mensaje
             std::cout << "System: " << "Enter a message:" << std::endl;
 
             std::getline(std::cin, message);
-        }
-        else
-        {
+            
+            packet.clear(); //Limpiamos el paquete para su uso
             packet << message;
 
             server->Send(packet, ip, port); //Enviamos la información de conexión y la información del paquete a enviar
             std::cout << srvAlias << message << std::endl;
 
             message.clear(); //Limpiamos la cadena para el mensaje
-            packet.clear(); //Limpiamos el paquete
-        }
     }
 }
 
