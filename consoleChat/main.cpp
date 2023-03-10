@@ -80,7 +80,7 @@ void serverPackageHandler(TCPSocketServer* server)
         //(obtenemos el ip y puerto del emisor del paquete)
         //(si nos interesase, aquí podríamos filtrar quien puede enviarnos paquetes)
         //Al ejecutar esta línea, el sistema queda a la espera de una conexión entrante
-        std::string alias = "Server: ";
+        std::string alias = "Client: ";
         sf::IpAddress client_ip;
         unsigned short client_port;
 
@@ -197,7 +197,6 @@ void main() {
             TCPSocketManager::Status status;
 
             std::future<void> serverPackagesHandler = std::async(std::launch::async, serverPackageHandler, server);
-            std::cout << "System: " << "Client disconnected." << std::endl;
         }
         else
         {
