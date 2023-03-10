@@ -39,11 +39,13 @@ TCPSocketManager::Status TCPSocketServer::Receive(sf::Packet& packet, sf::IpAddr
 {
 	sf::Socket::Status status = dispatcher.accept(incoming);
 
-	std::cout << sysAlias << "Detected incoming connection..." << std::endl;
+	//get the client's IP address and port
+	ip = incoming.getRemoteAddress();
+	port = incoming.getRemotePort();
 
 	if (status != sf::Socket::Done)
 	{
-		std::cerr << sysAlias << "Error accepting incoming connection." << std::endl;
+		std::cerr << sysAlias << "Error accepting incoming connection with " << ip << ":" << port << "." << std::endl;
 		return Status::Error;
 	}
 
@@ -52,13 +54,11 @@ TCPSocketManager::Status TCPSocketServer::Receive(sf::Packet& packet, sf::IpAddr
 
 	if (status != sf::Socket::Done)
 	{
-		std::cerr << sysAlias << "Error receiving packet." << std::endl;
+		std::cerr << sysAlias << "Error receiving packet of " << ip << ":" << port << "." << std::endl;
 		return Status::Error;
 	}
 
-	//get the client's IP address and port
-	ip = incoming.getRemoteAddress();
-	port = incoming.getRemotePort();
+	std::cout << sysAlias << "Client " << ip << ":" << port << " connected successfully." << std::endl;
 
 	return Status::Done;
 }
