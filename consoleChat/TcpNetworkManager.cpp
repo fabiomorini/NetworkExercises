@@ -1,5 +1,7 @@
 #include "TcpNetworkManager.h"
 
+constexpr bool debug = false;
+
 TCPSocketManager::Status TCPSocketManager::Send(sf::Packet& packet, sf::IpAddress ip, unsigned short port)
 {
 	sf::TcpSocket socket;
@@ -58,7 +60,7 @@ TCPSocketManager::Status TCPSocketServer::Receive(sf::Packet& packet, sf::IpAddr
 		return Status::Error;
 	}
 
-	std::cout << sysAlias << "Client " << ip << ":" << port << " connected successfully." << std::endl;
+	if(debug) std::cout << sysAlias << "Client " << ip << ":" << port << " connected successfully." << std::endl;
 
 	return Status::Done;
 }
