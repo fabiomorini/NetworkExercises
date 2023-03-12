@@ -14,7 +14,10 @@ public:
 	};
 
 	TCPSocketManager() = default;
+	
+	//Enviamos la información de conexión y la información del paquete a enviar.
 	Status Send(sf::Packet& packet, sf::IpAddress ip, unsigned short port);
+	
 	virtual Status Receive(sf::Packet& packet, sf::IpAddress& ip, unsigned short& port) = 0;
 	unsigned short GetLocalPort();
 	virtual bool Disconnect() = 0;
@@ -29,8 +32,13 @@ class TCPSocketServer : public TCPSocketManager
 
 public:
 	TCPSocketServer() = default;
+
+	//Recepción de paquetes e información del remitente.
 	virtual Status Receive(sf::Packet& packet, sf::IpAddress& ip, unsigned short& port) override;
+	
+	//Empezamos a escuchar el puerto especificado si está disponible.
 	bool Listen(sf::IpAddress& ip, unsigned short& port);
+	
 	virtual bool Disconnect() override;
 };
 

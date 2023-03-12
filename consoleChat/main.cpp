@@ -4,7 +4,9 @@
 #include "TcpNetworkManager.h"
 #include <future>
 
+bool debug = false;
 
+//Introducimos una línea de texto por teclado.
 std::string GetLineFromCin() {
 	std::string line;
 
@@ -14,202 +16,230 @@ std::string GetLineFromCin() {
 	return line;
 }
 
+//Escribimos el mensaje y lo empaquetamos.
+void prepareMessage(sf::Packet& packet)
+{
+    if (debug) std::cout << "System: ";
+    std::cout << "Enter a message:" << std::endl;
+
+    packet.clear(); //Limpiamos el paquete para su uso
+    packet << GetLineFromCin();
+}
+
+//Gestión del envío de paquetes del cliente.
 void clientMessageHandler(TCPSocketClient* client, sf::IpAddress ip, unsigned short port)
 {
-    std::string cliAlias = "Client: ";
-
-    //Creamos un paquete y cadena de texto nuevos para enviar el mensaje
+    //Creamos un paquete nuevo para enviar el mensaje.
     sf::Packet packet;
-    std::string message;
 
     while (true)
     {
-        //El cliente escribe un mensaje
-        std::cout << "System: " << "Enter a message:" << std::endl;
+        prepareMessage(packet);
 
-        message = GetLineFromCin();
-
-        packet.clear(); //Limpiamos el paquete para su uso
-        packet << message;
-
-        client->Send(packet, ip, port); //Enviamos la información de conexión y la información del paquete a enviar
-        std::cout << cliAlias << message << std::endl;
-
-        message.clear(); //Limpiamos la cadena del mensaje
+        client->Send(packet, ip, port);
     }
 }
 
+//Gestión del envío de paquetes del servidor.
 void serverMessageHandler(TCPSocketServer* server, sf::IpAddress ip, unsigned short port)
 {
-    std::string srvAlias = "Server: ";
-
-    //Creamos un paquete y cadena de texto nuevos para enviar el mensaje
+    //Creamos un paquete nuevo para enviar el mensaje.
     sf::Packet packet;
-    std::string message;
 
     while (true)
     {
-            //El cliente escribe un mensaje
-            std::cout << "System: " << "Enter a message:" << std::endl;
+        prepareMessage(packet);
 
-            std::getline(std::cin, message);
-            
-            packet.clear(); //Limpiamos el paquete para su uso
-            packet << message;
-
-            server->Send(packet, ip, port); //Enviamos la información de conexión y la información del paquete a enviar
-            std::cout << srvAlias << message << std::endl;
-
-            message.clear(); //Limpiamos la cadena para el mensaje
+        server->Send(packet, ip, port);
     }
 }
 
-void serverPackageHandler(TCPSocketServer* server, sf::IpAddress ip, unsigned short port)
+//Procesamos el paquete para leer el mensaje que contiene.
+void packageMessageReader(sf::Packet& packet, std::string& alias)
 {
-    if (server->Listen(ip, port)) //Empezamos a escuchar el puerto especificado si está disponible
-    {
-        std::cout << "System: " << "Server started on " << ip.toString() << ":" << port << std::endl;
+    // Process received packet
+    std::string message;
+    packet >> message;
+    std::cout << alias << message << std::endl;
+    packet.clear(); //Limpiamos el paquete.
+    if(debug) std::cout << "System: " << "Recieved package cleared." << std::endl;
+}
 
-        //Estado de la conexión con el cliente
+//Gestión de la conexión de clientes y recepción de paquetes.
+//Al ejecutar esta función, el sistema queda a la espera de una conexión entrante.
+void serverConnectionsHandler(TCPSocketServer* server, sf::IpAddress ip, unsigned short port)
+{
+    std::string alias = "Client: ";
+    if (server->Listen(ip, port))
+    {
+        if (debug) std::cout << "System: ";
+        std::cout << "Server started on " << ip.toString() << ":" << port << std::endl;
+
+        //Estado de la conexión del socket.
         TCPSocketManager::Status status{};
 
-        do { //Esperamos la conexión de clientes
-            std::cout << "System: " << "Waiting clients..." << std::endl;
+        do { //Esperamos la conexión de clientes.
+            if (debug) std::cout << "System: ";
+            std::cout << "Waiting clients..." << std::endl;
 
-            //Recibimos el paquete y rellenamos las variables creadas anteriormente
-            //(obtenemos el ip y puerto del emisor del paquete)
-            //(si nos interesase, aquí podríamos filtrar quien puede enviarnos paquetes)
-            //Al ejecutar esta línea, el sistema queda a la espera de una conexión entrante
-            std::string alias = "Client: ";
-            sf::IpAddress client_ip;
-            unsigned short client_port;
+            //Dirección IP del remitente.
+            sf::IpAddress remote_ip; //Si nos interesase, aquí podríamos filtrar quien puede enviarnos paquetes.
 
-            //Creamos un paquete nuevo para recuperar la información
+            //Puerto del remitente.
+            unsigned short remote_port;
+
+            //Creamos un paquete nuevo para recuperar la información.
             sf::Packet packet;
 
-            status = server->Receive(packet, client_ip, client_port);
+            status = server->Receive(packet, remote_ip, remote_port);
 
             //Si hemos obtenido los datos correctamente, obtenemos la información del paquete
             if (status == TCPSocketManager::Status::Done)
             {
-                // Process received packet
-                std::string message;
-                packet >> message;
-                std::cout << alias << message << std::endl;
-                packet.clear(); //Limpiamos el paquete
-                std::cout << "System: " << "Recieved package cleared." << std::endl;
+                packageMessageReader(packet, alias);
             }
             else {
                 switch (status)
                 {
                 case TCPSocketManager::Status::Disconnected:
-                    std::cout << "System: " << "Client status: Disconnected." << std::endl;
+                    if (debug) std::cout << "System: ";
+                    std::cout << "Client status: Disconnected." << std::endl;
 
                 case TCPSocketManager::Status::Connected:
-                    std::cout << "System: " << "Client status: Connected." << std::endl;
+                    if (debug) std::cout << "System: ";
+                    std::cout << "Client status: Connected." << std::endl;
 
                 case TCPSocketManager::Status::Error:
-                    std::cout << "System: " << "Client status: Error." << std::endl;
+                    if (debug) std::cout << "System: ";
+                    std::cout << "Client status: Error." << std::endl;
 
                 default:
-                    std::cout << "System: " << "Client status: Unknown." << std::endl;
+                    if (debug) std::cout << "System: ";
+                    std::cout << "Client status: Unknown." << std::endl;
                 }
             }
 
-        } while (status != TCPSocketManager::Status::Disconnected); //Si el cliente se desconecta, cerramos la conexión
+        } while (status != TCPSocketManager::Status::Disconnected); //Si el cliente se desconecta, cerramos la conexión.
     }
     else
     {
-        std::cout << "System: " << "Failed to start server." << std::endl;
+        if (debug) std::cout << "System: ";
+        std::cout << "Failed to start server." << std::endl;
     }
 }
 
+//Gestión de la conexión de clientes y recepción de paquetes.
+//Al ejecutar esta función, el sistema queda a la espera de una conexión entrante.
 void clientPackageHandler(TCPSocketClient* client, sf::IpAddress ip, unsigned short port)
 {
+    std::string alias = "Server: ";
+    
+    //Estado de la conexión del socket.
     TCPSocketManager::Status status{};
-    do { //Esperamos la conexión de clientes
-        std::cout << "System: " << "Waiting clients..." << std::endl;
 
-        //Recibimos el paquete y rellenamos las variables creadas anteriormente
-        //(obtenemos el ip y puerto del emisor del paquete)
-        //(si nos interesase, aquí podríamos filtrar quien puede enviarnos paquetes)
-        //Al ejecutar esta línea, el sistema queda a la espera de una conexión entrante
-        std::string alias = "Server: ";
-        sf::IpAddress client_ip;
-        unsigned short client_port;
+    do { //Esperamos la conexión de clientes.
+        if (debug) std::cout << "System: ";
+        std::cout << "Waiting clients..." << std::endl;
 
-        //Creamos un paquete nuevo para recuperar la información
+        //Dirección IP del remitente.
+        sf::IpAddress remote_ip; //Si nos interesase, aquí podríamos filtrar quien puede enviarnos paquetes.
+
+        //Puerto del remitente.
+        unsigned short remote_port;
+
+        //Creamos un paquete nuevo para recuperar la información.
         sf::Packet packet;
 
-        status = client->Receive(packet, client_ip, client_port);
+        status = client->Receive(packet, remote_ip, remote_port);
 
         //Si hemos obtenido los datos correctamente, obtenemos la información del paquete
         if (status == TCPSocketManager::Status::Done)
         {
-            // Process received packet
-            std::string message;
-            packet >> message;
-            std::cout << alias << message << std::endl;
-            packet.clear(); //Limpiamos el paquete
-            std::cout << "System: " << "Recieved package cleared." << std::endl;
+            packageMessageReader(packet, alias);
         }
         else {
             switch (status)
             {
             case TCPSocketManager::Status::Disconnected:
-                std::cout << "System: " << "Client status: Disconnected." << std::endl;
+                if (debug) std::cout << "System: ";
+                std::cout << "Client status: Disconnected." << std::endl;
 
             case TCPSocketManager::Status::Connected:
-                std::cout << "System: " << "Client status: Connected." << std::endl;
+                if (debug) std::cout << "System: ";
+                std::cout << "Client status: Connected." << std::endl;
 
             case TCPSocketManager::Status::Error:
-                std::cout << "System: " << "Client status: Error." << std::endl;
+                if (debug) std::cout << "System: ";
+                std::cout << "Client status: Error." << std::endl;
 
             default:
-                std::cout << "System: " << "Client status: Unknown." << std::endl;
+                if (debug) std::cout << "System: ";
+                std::cout << "Client status: Unknown." << std::endl;
             }
         }
-    } while (status != TCPSocketManager::Status::Disconnected); //Si el cliente se desconecta, cerramos la conexión
+
+    } while (status != TCPSocketManager::Status::Disconnected); //Si el cliente se desconecta, cerramos la conexión.
+}
+
+//Selector entre modo cliente o servidor.
+int modeSelector()
+{
+    std::string mode_str;
+    if (debug) std::cout << "System: ";
+    std::cout << "Select a mode: (1) server, (2) cliente" << std::endl;
+    std::cin >> mode_str;
+    std::cin.clear();
+    std::cin.ignore();
+    return std::stoi(mode_str);
+}
+
+//Gestión del funcionamiento general del servidor.
+void serverManager(sf::IpAddress& ip, unsigned short& port)
+{
+    if (debug) std::cout << "System: ";
+    std::cout << "Server mode running." << std::endl;
+
+    //Abrimos un nuevo socket para la comunicación del servidor.
+    auto server = new TCPSocketServer();
+
+    //std::future<void> smh = std::async(std::launch::async, serverMessageHandler, server, ip, port);
+
+    std::future<void> sch = std::async(std::launch::async, serverConnectionsHandler, server, ip, port);
+}
+
+//Gestión del funcionamiento general del cliente.
+void clientManager(sf::IpAddress& ip, unsigned short& port)
+{
+    if (debug) std::cout << "System: ";
+    std::cout << "Client mode running." << std::endl;
+
+    //Abrimos un nuevo socket para la comunicación del cliente.
+    auto client = new TCPSocketClient();
+
+    //Conectamos con el servidor alojado en la dirección y puerto especificados
+    if (client->Connect(ip, port) == TCPSocketManager::Status::Connected)
+    {
+        if (debug) std::cout << "System: ";
+        std::cout << "Connected to server." << std::endl;
+
+        //Dejamos que el cliente pueda enviarle mensajes al servidor
+        std::future<void> cmh = std::async(std::launch::async, clientMessageHandler, client, ip, port);
+    }
 }
 
 void main() {
+    //Identifica el modo en uso (cliente - servidor).
 	int server_mode;
-	std::string mode_str;
-	std::cout << "System: " << "Select a mode: (1) server, (2) cliente" << std::endl;
-	std::cin >> mode_str;
-    std::cin.clear();
-    std::cin.ignore();
-	server_mode = std::stoi(mode_str);
-    sf::IpAddress ip("127.0.0.1");
+    server_mode = modeSelector();
+
     //sf::IpAddress ip = sf::IpAddress::getLocalAddress();
+    sf::IpAddress ip("127.0.0.1");
     unsigned short port = 5000;
 
-    #pragma region Server
 	if (server_mode == 1) {
-        std::cout << "System: " << "Server mode running." << std::endl;
-
-        auto server = new TCPSocketServer(); //Abrimos un nuevo socket para la comunicación del servidor
-
-        //Dejamos que el servidor pueda enviar mensajes a los clientes
-        //std::future<void> serverMessengerHandler = std::async(std::launch::async, serverMessageHandler, server, ip, port);
-
-        std::future<void> serverPackagesHandler = std::async(std::launch::async, serverPackageHandler, server, ip, port);
+        serverManager(ip, port);
     }
-    #pragma endregion Server
-
-    #pragma region Client
 	else if (server_mode == 2) {
-		std::cout << "System: " << "Client mode running." << std::endl;
-        auto client = new TCPSocketClient(); //Abrimos un nuevo socket para la comunicación del cliente
-
-        //Conectamos con el servidor alojado en la dirección y puerto especificados
-        if (client->Connect(ip, port) == TCPSocketManager::Status::Connected)
-        {
-            std::cout << "System: " << "Connected to server." << std::endl;
-
-            //Dejamos que el cliente pueda enviarle mensajes al servidor
-            std::future<void> clientMessengerHandler = std::async(std::launch::async, clientMessageHandler, client, ip, port);
-        }
+        clientManager(ip, port);
 	}
-    #pragma endregion client
 }
