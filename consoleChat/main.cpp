@@ -98,6 +98,8 @@ void serverConnectionsHandler(TCPSocketServer* server, sf::IpAddress ip, unsigne
             //Si hemos obtenido los datos correctamente, obtenemos la información del paquete
             if (status == TCPSocketManager::Status::Done)
             {
+                if (debug) std::cout << "System: " << "Client status: Done." << std::endl;
+
                 // Process received packet
                 std::string message;
                 packageMessageReader(packet, message, alias);
@@ -210,6 +212,14 @@ void serverManager(sf::IpAddress& ip, unsigned short& port)
     //std::future<void> smh = std::async(std::launch::async, serverMessageHandler, server, ip, port);
 
     std::future<void> sch = std::async(std::launch::async, serverConnectionsHandler, server, ip, port);
+
+    while (sch.wait_for(std::chrono::milliseconds(100)) != std::future_status::ready) {
+        // La operación aún no ha terminado
+        // Podemos hacer otras cosas aquí, como mostrar un mensaje de espera
+    }
+
+    // La operación ha terminado
+    // Podemos hacer otras cosas aquí, como mostrar un mensaje de éxito
 }
 
 //Gestión del funcionamiento general del cliente.
