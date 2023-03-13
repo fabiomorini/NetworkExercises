@@ -228,7 +228,7 @@ void clientManager(sf::IpAddress& ip, unsigned short& port)
         std::cout << "Connected to server." << std::endl;
 
         //Dejamos que el cliente pueda enviarle mensajes al servidor
-        std::future<void> cmh = std::async(std::launch::async, clientMessageHandler, client, ip, port);
+        clientMessageHandler(client,ip,port);
     }
 }
 
